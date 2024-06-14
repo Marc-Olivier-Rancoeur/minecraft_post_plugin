@@ -57,4 +57,7 @@ public class LaPoste extends JavaPlugin {
             return configurationSection.getKeys(false);
         }
     }
+    public boolean isOp(Player player){
+        return getConfig().getBoolean("ops."+player.getName());
+    }
 }

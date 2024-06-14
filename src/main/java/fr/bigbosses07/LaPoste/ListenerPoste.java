@@ -81,7 +81,7 @@ public class ListenerPoste implements Listener {
                             setMailNumber(boxInfos, 0);
                             updateLight(block, false);
                             laPoste.saveConf();
-                        }else if(isOp(player)){
+                        }else if(laPoste.isOp(player)){
                             player.sendMessage("Boite aux lettres de : " + boxInfos.playerName);
                             if(mailBoxIsEmpty(chestInventory)){
                                 setMailNumber(boxInfos, 0);
@@ -98,7 +98,7 @@ public class ListenerPoste implements Listener {
                             player.sendMessage("Suppression de votre boite aux lettres. En cas de mauvaise manipulation, contactez un administrateur");
                             destroyMailBox(boxInfos, block);
                             laPoste.saveConf();
-                        }else if(isOp(player)){
+                        }else if(laPoste.isOp(player)){
                             player.sendMessage("Suppression de la boite aux lettres de : " + boxInfos.playerName);
                             destroyMailBox(boxInfos, block);
                             laPoste.saveConf();
@@ -172,9 +172,7 @@ public class ListenerPoste implements Listener {
         lampBlock.setBlockData(lightable);
     }
 
-    private boolean isOp(Player player){
-        return laPoste.getConfig().getInt("ops."+player.getName()) == 1;
-    }
+
 
     private int getMailNumber(BoxInfos boxInfos){
         return laPoste.getConfig().getInt("players." + boxInfos.playerName + ".addresses." + boxInfos.address + ".mails");
@@ -193,7 +191,6 @@ public class ListenerPoste implements Listener {
     }
 
     private void destroyMailBox(BoxInfos boxInfos, Block chestBlock){
-        Location location = chestBlock.getLocation();
         laPoste.getConfig().set("players." + boxInfos.playerName + ".addresses." + boxInfos.address + ".chest.isSet", false);
     }
 

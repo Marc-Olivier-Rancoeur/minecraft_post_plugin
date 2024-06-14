@@ -180,7 +180,7 @@ public class CommandePoste implements CommandExecutor {
             Player player = laPoste.getPlayerFromName(args[1]);
             if(player != null){
                 if(opValue){
-                    if(isOp(commandPlayer)){
+                    if(laPoste.isOp(commandPlayer)){
                         commandPlayer.sendMessage(player.getName() + " est déjà administrateur de la poste");
                     }else{
                         laPoste.getConfig().set("ops."+player.getName(), true);
@@ -188,7 +188,7 @@ public class CommandePoste implements CommandExecutor {
                         commandPlayer.sendMessage(player.getName() + " est désormais administrateur de la poste");
                     }
                 }else{
-                    if(isOp(commandPlayer)){
+                    if(laPoste.isOp(commandPlayer)){
                         laPoste.getConfig().set("ops."+player.getName(), false);
                         laPoste.saveConf();
                         commandPlayer.sendMessage(player.getName() + " n'est plus administrateur de la poste");
@@ -233,9 +233,6 @@ public class CommandePoste implements CommandExecutor {
     private boolean addressHaveChest(Player player, String addr){
         return laPoste.getConfig().getBoolean("players."+player.getName()+".addresses."+addr+".chest.isSet");
     }
-    private boolean isOp(Player player){
-        return laPoste.getConfig().getInt("ops."+player.getName()) == 1;
-    }
 
     private void setChest(Location location, boolean lamp){
         Block chestBlock = location.getBlock();//commandPlayer.getWorld().getBlockAt(location);
@@ -260,7 +257,7 @@ public class CommandePoste implements CommandExecutor {
             lampz = 1;
         }
 
-        //chestBlock.setBlockData(chestBlockData);
+        chestBlock.setBlockData(chestBlockData);
 
         if(lamp) {
             Block lampBlock = commandPlayer.getWorld().getBlockAt(location.getBlockX() + lampx, location.getBlockY(), location.getBlockZ() + lampz);

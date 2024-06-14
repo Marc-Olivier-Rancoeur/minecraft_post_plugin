@@ -7,5 +7,5 @@ main: fr.bigbosses07.LaPoste.LaPoste
 commands:
   poste:
     description: Commande pour le plugin de la poste pour toutes les interactions.
-    usage: /poste <commande> <joueur> <arguments>
+    usage: /poste <commande> <joueur>
     permission: poste.use
