@@ -1,0 +1,11 @@
+name: la-poste
+version: ALPHA-0.0.1
+author: bigbosses07
+website: https://www.spff.fr
+api-version: 1.20
+main: fr.bigbosses07.LaPoste.LaPoste
+commands:
+  poste:
+    description: Commande pour le plugin de la poste pour toutes les interactions.
+    usage: /poste <commande> <joueur> <arguments>
+    permission: poste.use
