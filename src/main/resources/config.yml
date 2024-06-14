@@ -5,4 +5,4 @@
 ####################
 players:
 ops:
-  bigbosses07: true
+  - bigbosses07

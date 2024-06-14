@@ -41,14 +41,14 @@ public class tabCompleterPoste implements TabCompleter {
                 list.add("remove");
                 list.add("list");
             }else if(args[0].equalsIgnoreCase("op")){
-                Set<String> opPlayers = laPoste.getOpList();
+                List<String> opPlayers = laPoste.getOpList();
                 for(Player player : Bukkit.getOnlinePlayers()){
                     if(!opPlayers.contains(player.getName())) {
                         list.add(player.getName());
                     }
                 }
             }else if(args[0].equalsIgnoreCase("deop")){
-                Set<String> opPlayers = laPoste.getOpList();
+                List<String> opPlayers = laPoste.getOpList();
                 list.addAll(opPlayers);
             }
         }

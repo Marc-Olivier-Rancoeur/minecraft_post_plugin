@@ -11,6 +11,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Set;
 
 public class CommandePoste implements CommandExecutor {
@@ -175,34 +176,33 @@ public class CommandePoste implements CommandExecutor {
         }
     }
 
-    private void opHandler(String[] args, boolean opValue){
-        if(args.length == 2) {
-            Player player = laPoste.getPlayerFromName(args[1]);
-            if(player != null){
-                if(opValue){
-                    if(laPoste.isOp(commandPlayer)){
-                        commandPlayer.sendMessage(player.getName() + " est déjà administrateur de la poste");
-                    }else{
-                        laPoste.getConfig().set("ops."+player.getName(), true);
+    private void opHandler(String[] args, boolean opValue) {
+        if (args.length == 2) {
+            if (opValue) {
+                if (laPoste.getPlayerFromName(args[1]) != null) {
+                    if (laPoste.isOp(commandPlayer)) {
+                        commandPlayer.sendMessage(args[1] + " est déjà administrateur de la poste");
+                    } else {
+                        List<String> list = laPoste.getOpList();
+                        list.add(args[1]);
+                        laPoste.getConfig().set("ops", list);
                         laPoste.saveConf();
-                        commandPlayer.sendMessage(player.getName() + " est désormais administrateur de la poste");
+                        commandPlayer.sendMessage(args[1] + " est désormais administrateur de la poste");
                     }
-                }else{
-                    if(laPoste.isOp(commandPlayer)){
-                        laPoste.getConfig().set("ops."+player.getName(), false);
-                        laPoste.saveConf();
-                        commandPlayer.sendMessage(player.getName() + " n'est plus administrateur de la poste");
-                    }else{
-                        commandPlayer.sendMessage(player.getName() + " n'est plus administrateur de la poste");
-
-                    }
-                    laPoste.getConfig().set("op."+player.getName(), opValue);
-                    laPoste.saveConf();
                 }
-            }else{
-                commandPlayer.sendMessage("le joueur indiqué n'existe pas");
+            } else {
+                if (laPoste.isOp(commandPlayer)) {
+                    List<String> list = laPoste.getOpList();
+                    list.remove(args[1]);
+                    laPoste.getConfig().set("ops", list);
+                    laPoste.saveConf();
+                    commandPlayer.sendMessage(args[1] + " n'est plus administrateur de la poste");
+                } else {
+                    commandPlayer.sendMessage(args[1] + " n'est pas administrateur de la poste");
+
+                }
             }
-        }else{
+        } else {
             commandPlayer.sendMessage("La commande est malformée");
         }
     }

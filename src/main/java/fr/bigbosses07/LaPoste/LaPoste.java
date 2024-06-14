@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class LaPoste extends JavaPlugin {
@@ -49,15 +50,13 @@ public class LaPoste extends JavaPlugin {
         return Bukkit.getPlayer(playerName);
     }
 
-    public Set<String> getOpList(){
-        ConfigurationSection configurationSection = getConfig().getConfigurationSection("ops");
-        if (configurationSection == null) {
-            return new HashSet<>();
-        } else {
-            return configurationSection.getKeys(false);
-        }
+    public List<String> getOpList(){
+        return getConfig().getStringList("ops");
     }
     public boolean isOp(Player player){
-        return getConfig().getBoolean("ops."+player.getName());
+        return isOp(player.getName());
+    }
+    public boolean isOp(String playerName){
+        return getConfig().getStringList("ops").contains(playerName);
     }
 }
