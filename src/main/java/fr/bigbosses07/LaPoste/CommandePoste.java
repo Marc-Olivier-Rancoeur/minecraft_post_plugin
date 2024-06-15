@@ -150,9 +150,9 @@ public class CommandePoste implements CommandExecutor {
                         setChest(location, false);
 
                         laPoste.getConfig().set("boxes." + args[2] + ".mails", 0);
-                        laPoste.getConfig().set("boxes." + args[2] + ".X", location.getBlockX());
-                        laPoste.getConfig().set("boxes." + args[2] + ".Y", location.getBlockY());
-                        laPoste.getConfig().set("boxes." + args[2] + ".Z", location.getBlockZ());
+                        laPoste.getConfig().set("boxes." + args[2] + ".x", location.getBlockX());
+                        laPoste.getConfig().set("boxes." + args[2] + ".y", location.getBlockY());
+                        laPoste.getConfig().set("boxes." + args[2] + ".z", location.getBlockZ());
                         laPoste.saveConf();
 
                         commandPlayer.sendMessage("La boite postale " + args[2] + " a été ajoutée avec succès");
@@ -213,7 +213,7 @@ public class CommandePoste implements CommandExecutor {
         commandPlayer.sendMessage("/poste address add <player> <name> <description> <chest>");
         commandPlayer.sendMessage("<player> : le nom du joueur");
         commandPlayer.sendMessage("<name> : le nom de l'adresse sans espace");
-        commandPlayer.sendMessage("<description> : la description affichée avec espaces");
+        commandPlayer.sendMessage("<description> : la description avec des _ affichée avec des espaces");
         commandPlayer.sendMessage("<chest> : true/false si le coffre doit être installé en même temps");
     }
 

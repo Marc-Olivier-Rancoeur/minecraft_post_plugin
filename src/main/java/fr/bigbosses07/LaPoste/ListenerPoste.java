@@ -30,21 +30,30 @@ public class ListenerPoste implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
+        int mails = 0;
         if(getNbAddresses(player) > 0){
-            int mails = 0;
             player.sendMessage("§7SPFF -- Poste");
-            for (String address : laPoste.getConfig().getConfigurationSection("players." + player.getName() + ".addresses").getKeys(false)){
+            for (String address : laPoste.getPlayerAddresses(player.getName())){
                 int nbMails = laPoste.getConfig().getInt("players." + player.getName() + ".addresses." + address + ".mails");
                 if(nbMails > 0){
-                    player.sendMessage(" Vous avez " + nbMails + " courriers chez vous : §7" + laPoste.getConfig().getString("players." + player.getName() + ".addresses." + address + ".description"));
+                    player.sendMessage(" Vous avez " + nbMails + " courriers chez vous : §7" + laPoste.getConfig().getString("players." + player.getName() + ".addresses." + address + ".description").replace('_', ' '));
                     mails += nbMails;
                 }
             }
-            if(mails == 0) {
-                player.sendMessage("§7 Vous n'avez reçu aucun courrier.");
-            }else {
-                player.sendMessage("§c Vous avez reçu " + mails + " courriers en tout.");
+        }
+        if(laPoste.isOp(player)){
+            for(String address : laPoste.getBoxesAddresses()){
+                int nbMails = laPoste.getConfig().getInt("boxes." + address + ".mails");
+                if(nbMails > 0){
+                    player.sendMessage(" Vous avez " + nbMails + " courriers en boite postale : §7" + address);
+                    mails += nbMails;
+                }
             }
+        }
+        if(mails == 0) {
+            player.sendMessage("§7 Vous n'avez reçu aucun courrier.");
+        }else {
+            player.sendMessage("§c Vous avez reçu " + mails + " courriers en tout.");
         }
     }
 
@@ -73,19 +82,33 @@ public class ListenerPoste implements Listener {
                                 chestInventory.setItem(availablePosition, itemCopy);
                                 player.sendMessage("Votre courrier a bien été posté !");
                                 addOneMail(boxInfos);
-                                updateLight(block);
+                                if(boxInfos.playerName != null) {
+                                    Player boxPlayer = laPoste.getPlayerFromName(boxInfos.playerName);
+                                    if(boxPlayer.isOnline()){
+                                        player.sendMessage("Un courrier vient d'être déposé dans votre boite aux lettres ");
+                                    }
+                                    updateLight(block);
+                                }
                                 laPoste.saveConf();
                             }
                         }else if(player.getName().equals(boxInfos.playerName)){
                             player.sendMessage("Bienvenue dans votre boite aux lettres");
                             setMailNumber(boxInfos, 0);
-                            updateLight(block, false);
+                            if(boxInfos.playerName != null) {
+                                updateLight(block, false);
+                            }
                             laPoste.saveConf();
                         }else if(laPoste.isOp(player)){
-                            player.sendMessage("Boite aux lettres de : " + boxInfos.playerName);
+                            if(boxInfos.playerName == null) {
+                                player.sendMessage("Boite postale : " + boxInfos.address);
+                            }else {
+                                player.sendMessage("Boite aux lettres de : " + boxInfos.playerName);
+                            }
                             if(mailBoxIsEmpty(chestInventory)){
                                 setMailNumber(boxInfos, 0);
-                                updateLight(block, false);
+                                if(boxInfos.playerName != null) {
+                                    updateLight(block, false);
+                                }
                                 laPoste.saveConf();
                             }
                         }else{
@@ -112,24 +135,31 @@ public class ListenerPoste implements Listener {
         }
     }
 
-    private BoxInfos getBox(Block block){
+    private BoxInfos getBox(Block block) {
         Location location = block.getLocation();
         ConfigurationSection playersConfigurationSection = laPoste.getConfig().getConfigurationSection("players");
-        if(playersConfigurationSection != null){
-            for(String playerName : playersConfigurationSection.getKeys(false)){
-                ConfigurationSection addressesConfigurationSection = laPoste.getConfig().getConfigurationSection("players." + playerName + ".addresses");
-                if(addressesConfigurationSection != null){
-                    for(String address : addressesConfigurationSection.getKeys(false)){
-                        if(laPoste.getConfig().getBoolean("players." + playerName + ".addresses." + address + ".chest.isSet")) {
-                            int x = laPoste.getConfig().getInt("players." + playerName + ".addresses." + address + ".chest.x");
-                            int y = laPoste.getConfig().getInt("players." + playerName + ".addresses." + address + ".chest.y");
-                            int z = laPoste.getConfig().getInt("players." + playerName + ".addresses." + address + ".chest.z");
-                            if(location.getBlockX() == x && location.getBlockY() == y && location.getBlockZ() == z){
-                                return new BoxInfos(playerName, address);
-                            }
+        if (playersConfigurationSection != null) {
+            for (String playerName : playersConfigurationSection.getKeys(false)) {
+                Set<String> addressesSet = laPoste.getPlayerAddresses(playerName);
+                for (String address : addressesSet) {
+                    if (laPoste.getConfig().getBoolean("players." + playerName + ".addresses." + address + ".chest.isSet")) {
+                        int x = laPoste.getConfig().getInt("players." + playerName + ".addresses." + address + ".chest.x");
+                        int y = laPoste.getConfig().getInt("players." + playerName + ".addresses." + address + ".chest.y");
+                        int z = laPoste.getConfig().getInt("players." + playerName + ".addresses." + address + ".chest.z");
+                        if (location.getBlockX() == x && location.getBlockY() == y && location.getBlockZ() == z) {
+                            return new BoxInfos(playerName, address);
                         }
                     }
                 }
+            }
+        }
+        Set<String> boxSet = laPoste.getBoxesAddresses();
+        for(String box : boxSet){
+            int x = laPoste.getConfig().getInt("boxes." + box + ".x");
+            int y = laPoste.getConfig().getInt("boxes." + box + ".y");
+            int z = laPoste.getConfig().getInt("boxes." + box + ".z");
+            if (location.getBlockX() == x && location.getBlockY() == y && location.getBlockZ() == z) {
+                return new BoxInfos(null, box);
             }
         }
         return null;
@@ -175,11 +205,19 @@ public class ListenerPoste implements Listener {
 
 
     private int getMailNumber(BoxInfos boxInfos){
-        return laPoste.getConfig().getInt("players." + boxInfos.playerName + ".addresses." + boxInfos.address + ".mails");
+        if(boxInfos.playerName == null) {
+            return laPoste.getConfig().getInt("boxes." + boxInfos.address + ".mails");
+        }else {
+            return laPoste.getConfig().getInt("players." + boxInfos.playerName + ".addresses." + boxInfos.address + ".mails");
+        }
     }
 
     private void setMailNumber(BoxInfos boxInfos, int mailNumber){
-        laPoste.getConfig().set("players." + boxInfos.playerName + ".addresses." + boxInfos.address + ".mails", mailNumber);
+        if(boxInfos.playerName == null){
+            laPoste.getConfig().set("boxes." + boxInfos.address + ".mails", mailNumber);
+        }else {
+            laPoste.getConfig().set("players." + boxInfos.playerName + ".addresses." + boxInfos.address + ".mails", mailNumber);
+        }
     }
 
     private void addOneMail(BoxInfos boxInfos){
