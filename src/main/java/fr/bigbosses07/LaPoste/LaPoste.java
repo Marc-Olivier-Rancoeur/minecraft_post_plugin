@@ -36,6 +36,12 @@ public class LaPoste extends JavaPlugin {
             return configurationSection.getKeys(false);
         }
     }
+    public String getPlayerAddressDescription(String playerName, String address) {
+        return getConfig().getString("players." + playerName + ".addresses." + address + ".description").replace('_', ' ');
+    }
+    public String getBoxAddressDescription(String address) {
+        return getConfig().getString("boxes." + address + ".description").replace('_', ' ');
+    }
 
     public Set<String> getBoxesAddresses() {
         ConfigurationSection configurationSection = getConfig().getConfigurationSection("boxes");
