@@ -6,7 +6,7 @@
 
     <groupId>fr.bigbosses07</groupId>
     <artifactId>minecraft_post_plugin</artifactId>
-    <version>ALPHA-0.0.1</version>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

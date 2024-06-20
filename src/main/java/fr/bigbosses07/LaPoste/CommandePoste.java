@@ -141,7 +141,7 @@ public class CommandePoste implements CommandExecutor {
                         commandPlayer.sendMessage(boxAddress + " : " + laPoste.getConfig().getInt("boxes." + boxAddress + ".mails"));
                     }
                 }
-            }else if(args.length == 3) {
+            }else if(args.length == 4) {
                 if (args[1].equalsIgnoreCase("add")) {
                     if (doBoxExist(args[2])) {
                         commandPlayer.sendMessage("Cette adresse existe déjà");
@@ -150,6 +150,7 @@ public class CommandePoste implements CommandExecutor {
                         setChest(location, false);
 
                         laPoste.getConfig().set("boxes." + args[2] + ".mails", 0);
+                        laPoste.getConfig().set("boxes." + args[2] + ".description", args[3]);
                         laPoste.getConfig().set("boxes." + args[2] + ".x", location.getBlockX());
                         laPoste.getConfig().set("boxes." + args[2] + ".y", location.getBlockY());
                         laPoste.getConfig().set("boxes." + args[2] + ".z", location.getBlockZ());
@@ -235,7 +236,7 @@ public class CommandePoste implements CommandExecutor {
     }
 
     private void setChest(Location location, boolean lamp){
-        Block chestBlock = location.getBlock();//commandPlayer.getWorld().getBlockAt(location);
+        Block chestBlock = location.getBlock();
         chestBlock.setType(Material.CHEST);
 
         int lampx = 0;
